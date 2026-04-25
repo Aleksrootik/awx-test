@@ -1,8 +1,14 @@
 ---
-- name: Base server configuration
-  hosts: all
+- name: Base setup for all nodes
+  hosts: all_nodes
+  become: yes
+
+  roles:
+    - common
+
+- name: User management on target node
+  hosts: target
   become: yes
 
   roles:
     - users
-    - common
