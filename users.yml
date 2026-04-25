@@ -1,0 +1,22 @@
+---
+- name: Create local users
+  hosts: all
+  become: yes
+
+  vars:
+    local_users:
+      - name: devops
+        comment: "DevOps test user"
+        groups: wheel
+        shell: /bin/bash
+
+  tasks:
+    - name: Create users
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        comment: "{{ item.comment }}"
+        groups: "{{ item.groups }}"
+        append: yes
+        shell: "{{ item.shell }}"
+        state: present
+      loop: "{{ local_users }}"
