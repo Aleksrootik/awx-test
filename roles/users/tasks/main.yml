@@ -1,0 +1,11 @@
+---
+- name: Create users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    comment: "{{ item.comment }}"
+    groups: "{{ item.groups }}"
+    append: yes
+    shell: "{{ item.shell }}"
+    password: "{{ devops_password_hash | default(omit) }}"
+    state: present
+  loop: "{{ local_users }}"
