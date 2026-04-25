@@ -19,6 +19,22 @@
     name: alloy
     state: present
 
+- name: Create Alloy systemd override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/alloy.service.d
+    state: directory
+    mode: '0755'
+
+- name: Run Alloy as root
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/alloy.service.d/override.conf
+    mode: '0644'
+    content: |
+      [Service]
+      User=root
+      Group=root
+  notify: Restart alloy
+
 - name: Deploy Alloy config
   ansible.builtin.template:
     src: config.alloy.j2
