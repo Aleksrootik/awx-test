@@ -1,0 +1,8 @@
+---
+- name: Test target group
+  hosts: target
+  gather_facts: false
+
+  tasks:
+    - debug:
+        msg: "I am target node: {{ inventory_hostname }}"
