@@ -9,7 +9,6 @@
         comment: "DevOps test user"
         groups: wheel
         shell: /bin/bash
-        password_hash: "{{ devops_password_hash }}"
 
   tasks:
     - name: Create users
@@ -19,7 +18,6 @@
         groups: "{{ item.groups }}"
         append: yes
         shell: "{{ item.shell }}"
-        password: "{{ item.password_hash }}"
+        password: "{{ devops_password_hash }}"
         state: present
       loop: "{{ local_users }}"
-      no_log: true
