@@ -1,0 +1,49 @@
+---
+- name: Create temporary backup directory
+  ansible.builtin.file:
+    path: /tmp/awx-backup
+    state: directory
+    mode: '0755'
+
+- name: Create VM3 backup archive
+  ansible.builtin.archive:
+    path:
+      - /etc
+      - /home
+      - /var/log
+    dest: "/tmp/awx-backup/{{ inventory_hostname }}-backup-{{ ansible_date_time.date }}.tar.gz"
+    format: gz
+  become: yes
+
+- name: Fetch backup archive to AWX execution node
+  ansible.builtin.fetch:
+    src: "/tmp/awx-backup/{{ inventory_hostname }}-backup-{{ ansible_date_time.date }}.tar.gz"
+    dest: "/tmp/awx-collected-backups/"
+    flat: yes
+
+- name: Copy backup to VM2 (management node)
+  ansible.builtin.copy:
+    src: "/tmp/awx-collected-backups/{{ inventory_hostname }}-backup-{{ ansible_date_time.date }}.tar.gz"
+    dest: "/root/awx-backups/VM3/"
+    mode: '0644'
+  delegate_to: VM2
+
+- name: Git add backup
+  ansible.builtin.command: git add .
+  args:
+    chdir: /root/awx-backups
+  delegate_to: VM2
+
+- name: Git commit backup
+  ansible.builtin.command: >
+    git commit -m "Backup {{ inventory_hostname }} {{ ansible_date_time.date }}"
+  args:
+    chdir: /root/awx-backups
+  delegate_to: VM2
+  ignore_errors: yes
+
+- name: Git push backup
+  ansible.builtin.command: git push
+  args:
+    chdir: /root/awx-backups
+  delegate_to: VM2

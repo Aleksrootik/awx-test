@@ -1,0 +1,8 @@
+---
+- name: Backup target server
+  hosts: target
+  become: yes
+  gather_facts: yes
+
+  roles:
+    - backup_target
