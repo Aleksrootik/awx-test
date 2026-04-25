@@ -26,11 +26,6 @@
     immediate: true
     state: enabled
 
-- name: Test firewalld module
-  ansible.posix.firewalld:
-    port: 9999/tcp
-    state: enabled
-
 - name: Create Loki data directories
   ansible.builtin.file:
     path: "{{ item }}"
