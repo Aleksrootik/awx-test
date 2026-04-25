@@ -4,3 +4,11 @@ local_users:
     comment: "DevOps test user"
     groups: wheel
     shell: /bin/bash
+
+common_packages:
+  - vim
+  - git
+  - curl
+  - wget
+  - net-tools
+  - bind-utils
