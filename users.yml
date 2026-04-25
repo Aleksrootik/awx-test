@@ -3,12 +3,5 @@
   hosts: all
   become: yes
 
-  vars:
-    local_users:
-      - name: devops
-        comment: "DevOps test user"
-        groups: wheel
-        shell: /bin/bash
-
   roles:
     - users
