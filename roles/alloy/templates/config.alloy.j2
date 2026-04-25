@@ -1,0 +1,25 @@
+local.file_match "system_logs" {
+  path_targets = [
+    {
+      __path__ = "/var/log/messages",
+      job      = "system",
+      host     = "{{ inventory_hostname }}",
+    },
+    {
+      __path__ = "/var/log/secure",
+      job      = "auth",
+      host     = "{{ inventory_hostname }}",
+    },
+  ]
+}
+
+loki.source.file "system_logs" {
+  targets    = local.file_match.system_logs.targets
+  forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+  endpoint {
+    url = "http://{{ loki_server_ip }}:{{ loki_http_port }}/loki/api/v1/push"
+  }
+}

@@ -1,0 +1,47 @@
+---
+- name: Add Grafana RPM repository
+  ansible.builtin.copy:
+    dest: /etc/yum.repos.d/grafana.repo
+    mode: '0644'
+    content: |
+      [grafana]
+      name=grafana
+      baseurl=https://rpm.grafana.com
+      repo_gpgcheck=1
+      enabled=1
+      gpgcheck=1
+      gpgkey=https://rpm.grafana.com/gpg.key
+      sslverify=1
+      sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+
+- name: Install Loki
+  ansible.builtin.dnf:
+    name: loki
+    state: present
+
+- name: Create Loki data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: loki
+    group: loki
+    mode: '0755'
+  loop:
+    - /var/lib/loki
+    - /var/lib/loki/chunks
+    - /var/lib/loki/compactor
+
+- name: Deploy Loki config
+  ansible.builtin.template:
+    src: loki.yml.j2
+    dest: /etc/loki/config.yml
+    owner: loki
+    group: loki
+    mode: '0644'
+  notify: Restart loki
+
+- name: Enable and start Loki
+  ansible.builtin.systemd:
+    name: loki
+    enabled: yes
+    state: started

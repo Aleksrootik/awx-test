@@ -12,3 +12,6 @@ common_packages:
   - wget
   - net-tools
   - bind-utils
+
+loki_server_ip: "192.168.56.20"
+loki_http_port: 3100

@@ -12,3 +12,17 @@
 
   roles:
     - users
+
+- name: Install Loki on monitoring node
+  hosts: monitoring
+  become: yes
+
+  roles:
+    - loki
+
+- name: Install Alloy log agent on management and target nodes
+  hosts: management:target
+  become: yes
+
+  roles:
+    - alloy
