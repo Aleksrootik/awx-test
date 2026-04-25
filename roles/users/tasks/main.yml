@@ -9,3 +9,8 @@
     password: "{{ devops_password_hash | default(omit) }}"
     state: present
   loop: "{{ local_users }}"
+
+- name: Force password change on first login
+  ansible.builtin.command: "chage -d 0 {{ item.name }}"
+  loop: "{{ local_users }}"
+  when: devops_password_hash is defined
