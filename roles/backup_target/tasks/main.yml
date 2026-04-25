@@ -6,13 +6,10 @@
     mode: '0755'
 
 - name: Create VM3 backup archive
-  ansible.builtin.archive:
-    path:
-      - /etc
-      - /home
-      - /var/log
-    dest: "/tmp/awx-backup/{{ inventory_hostname }}-backup-{{ ansible_date_time.date }}.tar.gz"
-    format: gz
+  ansible.builtin.command: >
+    tar --ignore-failed-read
+    -czf /tmp/awx-backup/{{ inventory_hostname }}-backup-{{ ansible_date_time.date }}.tar.gz
+    /etc /home /var/log
   become: yes
 
 - name: Fetch backup archive to AWX execution node
