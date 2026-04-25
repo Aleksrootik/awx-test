@@ -1,0 +1,9 @@
+---
+- name: Test monitoring group
+  hosts: monitoring
+  gather_facts: false
+
+  tasks:
+    - name: Show host
+      debug:
+        msg: "I am monitoring node: {{ inventory_hostname }}"
