@@ -1,0 +1,50 @@
+---
+- name: Create temporary monitoring backup directory
+  ansible.builtin.file:
+    path: /tmp/awx-backup
+    state: directory
+    mode: '0755'
+
+- name: Create monitoring backup archive
+  ansible.builtin.command: >
+    tar --ignore-failed-read
+    -czf /tmp/awx-backup/{{ inventory_hostname }}-monitoring-backup-{{ ansible_date_time.date }}.tar.gz
+    /etc/grafana
+    /var/lib/grafana
+    /etc/loki
+    /var/lib/loki
+    /etc/prometheus
+  become: yes
+
+- name: Fetch monitoring backup archive to AWX execution node
+  ansible.builtin.fetch:
+    src: "/tmp/awx-backup/{{ inventory_hostname }}-monitoring-backup-{{ ansible_date_time.date }}.tar.gz"
+    dest: "/tmp/awx-collected-backups/"
+    flat: yes
+
+- name: Copy monitoring backup to VM2 backup repository
+  ansible.builtin.copy:
+    src: "/tmp/awx-collected-backups/{{ inventory_hostname }}-monitoring-backup-{{ ansible_date_time.date }}.tar.gz"
+    dest: "/root/awx-backups/VM1/"
+    mode: '0644'
+  delegate_to: VM2
+
+- name: Git add monitoring backup
+  ansible.builtin.command: git add .
+  args:
+    chdir: /root/awx-backups
+  delegate_to: VM2
+
+- name: Git commit monitoring backup
+  ansible.builtin.command: >
+    git commit -m "Monitoring backup {{ inventory_hostname }} {{ ansible_date_time.date }}"
+  args:
+    chdir: /root/awx-backups
+  delegate_to: VM2
+  ignore_errors: yes
+
+- name: Git push monitoring backup
+  ansible.builtin.command: git push
+  args:
+    chdir: /root/awx-backups
+  delegate_to: VM2

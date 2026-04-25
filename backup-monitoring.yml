@@ -1,0 +1,8 @@
+---
+- name: Backup monitoring server
+  hosts: monitoring
+  become: yes
+  gather_facts: yes
+
+  roles:
+    - backup_monitoring
