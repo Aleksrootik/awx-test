@@ -14,7 +14,7 @@ DevOps Monitoring Stack (Project X)
 На личном ноутбуке в VirtualBox развернуты 3 виртуальные машины:
 
 - VM1 — RHEL 9.6 — Monitoring (Prometheus, Grafana, Loki)
-- VM2 — RHEL 9.7 — Managment (Kubernetes (k3s control-plane))
+- VM2 — RHEL 9.7 — Managment (Kubernetes, AWX, Git, k3s control-plane)
 - VM3 — RHEL 9.4 — target node (логи и тестовая нагрузка)
 
 Сетевые адреса:
