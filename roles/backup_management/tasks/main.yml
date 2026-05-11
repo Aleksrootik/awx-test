@@ -1,0 +1,46 @@
+---
+- name: Create temporary management backup directory
+  file:
+    path: /tmp/management-backup
+    state: directory
+
+- name: Create management backup archive
+  archive:
+    path:
+      - /etc
+      - /home
+      - /root
+      - /var/lib/rancher
+    dest: /tmp/management-backup/management-backup.tar.gz
+    format: gz
+
+- name: Fetch management backup archive to AWX execution node
+  fetch:
+    src: /tmp/management-backup/management-backup.tar.gz
+    dest: /tmp/
+    flat: yes
+
+- name: Copy management backup to local backup repository
+  copy:
+    src: /tmp/management-backup.tar.gz
+    dest: /home/aleksandr/awx-backups/management-backup.tar.gz
+  delegate_to: VM2
+
+- name: Git add management backup
+  command: git add .
+  args:
+    chdir: /home/aleksandr/awx-backups
+  delegate_to: VM2
+
+- name: Git commit management backup
+  command: git commit -m "Update management backup"
+  args:
+    chdir: /home/aleksandr/awx-backups
+  delegate_to: VM2
+  ignore_errors: yes
+
+- name: Git push management backup
+  command: git push
+  args:
+    chdir: /home/aleksandr/awx-backups
+  delegate_to: VM2

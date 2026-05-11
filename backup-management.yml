@@ -1,0 +1,7 @@
+---
+- name: Backup management server
+  hosts: management
+  become: yes
+
+  roles:
+    - backup_management
