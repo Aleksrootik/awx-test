@@ -1,46 +1,51 @@
 ---
 - name: Create temporary management backup directory
-  file:
+  ansible.builtin.file:
     path: /tmp/management-backup
     state: directory
+    mode: '0755'
 
 - name: Create management backup archive
-  archive:
+  ansible.builtin.archive:
     path:
-      - /etc
-      - /home
-      - /root
-      - /var/lib/rancher
+      - /etc/rancher
+      - /home/aleksandr/awx-test
+      - /home/aleksandr/awx-backups
+      - /home/aleksandr/tf-k3s
+      - /home/aleksandr/bot.py
+      - /etc/systemd/system/chatops-bot.service
     dest: /tmp/management-backup/management-backup.tar.gz
     format: gz
+  become: yes
 
 - name: Fetch management backup archive to AWX execution node
-  fetch:
+  ansible.builtin.fetch:
     src: /tmp/management-backup/management-backup.tar.gz
     dest: /tmp/
     flat: yes
 
-- name: Copy management backup to local backup repository
-  copy:
+- name: Copy management backup to VM2 backup repository
+  ansible.builtin.copy:
     src: /tmp/management-backup.tar.gz
     dest: /home/aleksandr/awx-backups/management-backup.tar.gz
+    mode: '0644'
   delegate_to: VM2
 
 - name: Git add management backup
-  command: git add .
+  ansible.builtin.command: git add .
   args:
     chdir: /home/aleksandr/awx-backups
   delegate_to: VM2
 
 - name: Git commit management backup
-  command: git commit -m "Update management backup"
+  ansible.builtin.command: git commit -m "Update management backup"
   args:
     chdir: /home/aleksandr/awx-backups
   delegate_to: VM2
   ignore_errors: yes
 
 - name: Git push management backup
-  command: git push
+  ansible.builtin.command: git push
   args:
     chdir: /home/aleksandr/awx-backups
   delegate_to: VM2
