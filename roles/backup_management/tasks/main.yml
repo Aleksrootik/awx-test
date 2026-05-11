@@ -5,17 +5,15 @@
     state: directory
     mode: '0755'
 
-- name: Create management backup archive
-  ansible.builtin.archive:
-    path:
-      - /etc/rancher
-      - /home/aleksandr/awx-test
-      - /home/aleksandr/awx-backups
-      - /home/aleksandr/tf-k3s
-      - /home/aleksandr/bot.py
-      - /etc/systemd/system/chatops-bot.service
-    dest: /tmp/management-backup/management-backup.tar.gz
-    format: gz
+- name: Create management backup archive with tar
+  ansible.builtin.command: >
+    tar -czf /tmp/management-backup/management-backup.tar.gz
+    /etc/rancher
+    /home/aleksandr/awx-test
+    /home/aleksandr/awx-backups
+    /home/aleksandr/tf-k3s
+    /home/aleksandr/bot.py
+    /etc/systemd/system/chatops-bot.service
   become: yes
 
 - name: Fetch management backup archive to AWX execution node
